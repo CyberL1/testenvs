@@ -1,0 +1,28 @@
+import type {
+  Environment,
+  RemoveEnvironmentParams,
+  RemoveEnvironmentQuery,
+} from "#src/types/Environment.ts";
+import { getEnvironment } from "#src/utils/environments.ts";
+import type { FastifyRequest } from "fastify";
+
+export const methods = {
+  get: (req: FastifyRequest<{ Params: Environment }>) => {
+    const container = getEnvironment(req.params.id);
+    // return getContainerResponse(container);
+    return container;
+  },
+
+  delete: async (
+    req: FastifyRequest<{
+      Params: RemoveEnvironmentParams & { id: string };
+      Querystring: RemoveEnvironmentQuery;
+    }>,
+  ) => {
+    const container = getEnvironment(req.params.id);
+
+    await container.remove({ force: req.query.force === "true" });
+    // return getContainerResponse(container);
+    return container;
+  },
+};
