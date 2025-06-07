@@ -10,6 +10,18 @@ export const createTestEnv = ({ name }: CreateEnvironmentBody) => {
     Labels: {
       "testenvs.container": "true",
     },
+    ExposedPorts: {
+      "22": {},
+    },
+    HostConfig: {
+      PortBindings: {
+        "22": [
+          {
+            HostPort: "12345",
+          },
+        ],
+      },
+    },
   });
 
   return container;
