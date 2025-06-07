@@ -12,7 +12,7 @@ export const createTestEnv = async ({ name }: CreateEnvironmentBody) => {
     },
   });
 
-  const network = dockerode.getNetwork("testenvs-network");
+  const network = dockerode.getNetwork("testenvs_default");
   await network.connect({ Container: container.id });
 
   return container;
