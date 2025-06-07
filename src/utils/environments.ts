@@ -29,7 +29,9 @@ export const getEnvironment = (id: string) => {
   return container;
 };
 
-export const getEnvironmentResponse = async (container: Dockerode.Container) => {
+export const getEnvironmentResponse = async (
+  container: Dockerode.Container,
+) => {
   const inspected = await container.inspect();
 
   const environment = {
