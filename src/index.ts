@@ -1,8 +1,8 @@
 import "dotenv/config";
 import fastify, {
-  type RouteOptions,
   type HTTPMethods,
   type RouteHandler,
+  type RouteOptions,
 } from "fastify";
 import { readdirSync } from "fs";
 
