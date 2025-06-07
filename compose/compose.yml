@@ -1,0 +1,15 @@
+name: testenvs
+
+services:
+  server:
+    build: ..
+    env_file: ../.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+  proxy:
+    build: ../proxy
+    env_file: ../.env
+    ports:
+      - 80:80
+    volumes:
+      - ../proxy/proxy.conf:/etc/nginx/templates/proxy.conf

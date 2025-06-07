@@ -10,18 +10,6 @@ export const createTestEnv = ({ name }: CreateEnvironmentBody) => {
     Labels: {
       "testenvs.container": "true",
     },
-    ExposedPorts: {
-      "22": {},
-    },
-    HostConfig: {
-      PortBindings: {
-        "22": [
-          {
-            HostPort: "12345",
-          },
-        ],
-      },
-    },
   });
 
   return container;
@@ -39,4 +27,17 @@ export const getEnvironments = () => {
 export const getEnvironment = (id: string) => {
   const container = dockerode.getContainer(id);
   return container;
+};
+
+export const getEnvironmentResponse = async (container: Dockerode.Container) => {
+  const inspected = await container.inspect();
+
+  const environment = {
+    id: inspected.Id,
+    name: inspected.Name.slice(1),
+    status: inspected.State.Status,
+    ip: inspected.NetworkSettings.IPAddress,
+  };
+
+  return environment;
 };

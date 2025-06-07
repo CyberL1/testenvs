@@ -14,6 +14,7 @@ export const methods: RouteMethods = {
 
     for (const container of containers) {
       const response = {
+        id: container.Id,
         name: container.Names[0].slice(1),
         status: container.State,
       } as Omit<Environment, "ip">;
