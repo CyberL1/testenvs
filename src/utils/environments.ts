@@ -3,14 +3,17 @@ import type { CreateEnvironmentBody } from "#src/types/Environment.ts";
 
 const dockerode = new Dockerode();
 
-export const createTestEnv = ({ name }: CreateEnvironmentBody) => {
-  const container = dockerode.createContainer({
+export const createTestEnv = async ({ name }: CreateEnvironmentBody) => {
+  const container = await dockerode.createContainer({
     name,
     Image: "testenvs/debian",
     Labels: {
       "testenvs.container": "true",
     },
   });
+
+  const network = dockerode.getNetwork("testenvs-network");
+  await network.connect({ Container: container.id });
 
   return container;
 };
@@ -38,7 +41,6 @@ export const getEnvironmentResponse = async (
     id: inspected.Id,
     name: inspected.Name.slice(1),
     status: inspected.State.Status,
-    ip: inspected.NetworkSettings.IPAddress,
   };
 
   return environment;

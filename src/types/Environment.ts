@@ -4,7 +4,6 @@ export interface Environment {
   id: string;
   name: string;
   status: string;
-  ip: string;
 }
 
 export interface CreateEnvironmentBody {
