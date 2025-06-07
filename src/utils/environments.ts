@@ -6,7 +6,7 @@ const dockerode = new Dockerode();
 export const createTestEnv = ({ name }: CreateEnvironmentBody) => {
   const container = dockerode.createContainer({
     name,
-    Image: "alpine",
+    Image: "testenvs/debian",
     Labels: {
       "testenvs.container": "true",
     },
