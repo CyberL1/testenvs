@@ -1,7 +1,5 @@
 #!/bin/sh
 
-sudo service ssh start
-
 # Wait for .repos file to be created
 while [ ! -f "$HOME/.repos" ]; do
   sleep 1

@@ -2,7 +2,7 @@ FROM debian
 ENV USER=tester
 
 RUN apt update && \
-  apt install -y sudo git curl openssh-server
+  apt install -y sudo git curl
 
 RUN adduser $USER --gecos "" && \
   echo "$USER:$USER" | chpasswd && \
