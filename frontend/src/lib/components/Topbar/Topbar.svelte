@@ -48,6 +48,7 @@
     <nav class="links">
       <ul class="nav-list">
         <li class="nav-item"><a href="/">Containers</a></li>
+        <li class="nav-item"><a href="/new">New container</a></li>
       </ul>
     </nav>
   </header>
