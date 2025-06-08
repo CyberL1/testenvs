@@ -13,3 +13,5 @@ services:
       - 80:80
     volumes:
       - ../proxy/proxy.conf:/etc/nginx/templates/proxy.conf
+  frontend:
+    build: ../frontend
