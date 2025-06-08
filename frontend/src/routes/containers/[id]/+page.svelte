@@ -1,9 +1,8 @@
 <script lang="ts">
 import { page } from "$app/state";
-import type { Container, ContainerStats } from "$lib/types/Contaier";
+import type { ContainerStats } from "$lib/types/Contaier";
 import { onMount } from "svelte";
 
-// let container: Container = null;
 let loading = true;
 let error: string | null = null;
 let stats: ContainerStats = null;

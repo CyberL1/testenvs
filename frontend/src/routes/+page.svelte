@@ -8,7 +8,6 @@ let error: string | null = null;
 
 onMount(async () => {
   try {
-    // Replace the URL with your actual API endpoint for listing containers
     const res = await fetch("/api/containers");
     if (!res.ok) {
       throw new Error("Failed to fetch containers");
