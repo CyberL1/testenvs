@@ -1,6 +1,5 @@
 import type {
   Environment,
-  RemoveEnvironmentParams,
   RemoveEnvironmentQuery,
 } from "#src/types/Environment.ts";
 import {
@@ -17,7 +16,7 @@ export const methods = {
 
   delete: async (
     req: FastifyRequest<{
-      Params: RemoveEnvironmentParams & { id: string };
+      Params: Environment;
       Querystring: RemoveEnvironmentQuery;
     }>,
   ) => {

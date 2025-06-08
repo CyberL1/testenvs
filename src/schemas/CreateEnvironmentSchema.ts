@@ -14,7 +14,7 @@ export const CreateEnvironmentSchema: FastifySchema = {
             url: { type: "string", minLength: 1 },
             branch: { type: "string", minLength: 1 },
           },
-          required: ["url", "branch"]
+          required: ["url", "branch"],
         },
       },
     },

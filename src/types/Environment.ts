@@ -11,10 +11,6 @@ export interface CreateEnvironmentBody {
   repositories: Repository[];
 }
 
-export interface RemoveEnvironmentParams {
-  force: boolean;
-}
-
 export interface RemoveEnvironmentQuery {
   force: string;
 }

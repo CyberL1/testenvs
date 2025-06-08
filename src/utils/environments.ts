@@ -16,7 +16,9 @@ export const createTestEnv = async (
 
   await container.start();
 
-  const repos = repositories.map((repo) => `${repo.url} ${repo.branch}`).join("\n");
+  const repos = repositories.map((repo) => `${repo.url} ${repo.branch}`).join(
+    "\n",
+  );
 
   const exec = await container.exec({
     Cmd: ["sh", "-c", `echo '${repos}' > .repos`],
@@ -58,4 +60,35 @@ export const getEnvironmentResponse = async (
   };
 
   return environment;
+};
+
+export const getEnvironmentRepositories = async (id: string) => {
+  const container = dockerode.getContainer(id);
+
+  const exec = await container.exec({
+    Cmd: ["cat", ".repos"],
+    AttachStdout: true,
+    AttachStderr: true,
+  });
+
+  const stream = await exec.start({});
+
+  let output = "";
+  await new Promise<void>((resolve, reject) => {
+    stream.on("data", (data: Buffer) => {
+      output += data.toString();
+    });
+    stream.on("end", resolve);
+    stream.on("error", reject);
+  });
+
+  const repositories = output.split("\n").filter(Boolean).map((line) => {
+    // Remove any weird encoding or non-printable characters
+    const cleanLine = line.replace(/[^\x20-\x7E]+/g, "");
+
+    const [url, branch] = cleanLine.split(" ");
+    return { url, branch };
+  });
+
+  return repositories;
 };
