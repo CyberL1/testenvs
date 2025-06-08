@@ -3,7 +3,9 @@ import type { CreateEnvironmentBody } from "#src/types/Environment.ts";
 
 const dockerode = new Dockerode();
 
-export const createTestEnv = async ({ name }: CreateEnvironmentBody) => {
+export const createTestEnv = async (
+  { name, repositories }: CreateEnvironmentBody,
+) => {
   const container = await dockerode.createContainer({
     name,
     Image: "testenvs/debian",
@@ -11,6 +13,18 @@ export const createTestEnv = async ({ name }: CreateEnvironmentBody) => {
       "testenvs.container": "true",
     },
   });
+
+  await container.start();
+
+  const repos = repositories.map((repo) => `${repo.url} ${repo.branch}`).join("\n");
+
+  const exec = await container.exec({
+    Cmd: ["sh", "-c", `echo '${repos}' > .repos`],
+    AttachStdout: true,
+    AttachStderr: true,
+  });
+
+  await exec.start({});
 
   const network = dockerode.getNetwork("testenvs_default");
   await network.connect({ Container: container.id });
