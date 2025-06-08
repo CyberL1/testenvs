@@ -92,3 +92,8 @@ export const getEnvironmentRepositories = async (id: string) => {
 
   return repositories;
 };
+
+export const deleteTestEnv = (id: string) => {
+  const container = dockerode.getContainer(id);
+  return container.remove({ force: true });
+};
