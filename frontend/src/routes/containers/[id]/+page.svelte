@@ -69,6 +69,19 @@ onMount(async () => {
         loading = false;
       }
     }}>Restart</button>
+
+    <button on:click={async () => {
+if (confirm("Delete container?")) {
+      try {
+        const res = await fetch(`/api/containers/${stats.id}?force=true`, { method: "DELETE" });
+        if (!res.ok) throw new Error("Failed to delete container");
+
+        window.location.href = "/";
+      } catch (e) {
+        error = e.message;
+      }
+    }
+    }}>Delete</button>
   </div>
 {:else}
   <p>Container not found.</p>
