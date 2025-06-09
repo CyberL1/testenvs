@@ -1,8 +1,22 @@
 <script lang="ts">
 import { onMount } from "svelte";
-let error: string = "";
 
-onMount(() => {
+let error: string = "";
+let defaultRepos: string[] = [];
+let selectedRepoBranches: string[] = [];
+
+onMount(async () => {
+  const defaultReposReq = await fetch("http://localtest.me/api/default_repos");
+  defaultRepos = await defaultReposReq.json();
+
+  const branchesReq = await fetch(
+    `https://api.github.com/repos/${defaultRepos[0].split("/")[3]}/${defaultRepos[0].split("/")[4]}/branches`,
+  );
+  const branchesJson = await branchesReq.json();
+
+  const branchNames = branchesJson.map((b) => b.name);
+  selectedRepoBranches = branchNames;
+
   document.querySelector("form")?.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -11,25 +25,14 @@ onMount(() => {
       name: form.name.value,
       repositories: Array.from(document.querySelectorAll("fieldset")).map(
         (fieldset) => {
-          const urlInput = fieldset.querySelector(
-            'input[name="repo-url"]',
+          const repoSelect = fieldset.querySelector(
+            'select[name="repo"]',
           ) as HTMLInputElement;
-          const branchInput = fieldset.querySelector(
-            'input[name="repo-branch"]',
+          const branchSelect = fieldset.querySelector(
+            'select[name="branch"]',
           ) as HTMLInputElement;
 
-          let returned = {};
-          if (
-            urlInput.value.trim().length > 0 &&
-            branchInput.value.trim().length > 0
-          ) {
-            returned = {
-              url: urlInput.value.trim(),
-              branch: branchInput.value.trim(),
-            };
-          }
-
-          return returned;
+          return { url: repoSelect.value, branch: branchSelect.value };
         },
       ),
     };
@@ -80,19 +83,44 @@ onMount(() => {
     </div>
     <fieldset style="margin-top: 1rem; padding: 1rem; border: 1px solid #eee;">
       <legend>Repository</legend>
+      {#if defaultRepos && defaultRepos.length > 0}
+        <div style="margin-bottom: 1rem;">
+          <label for="repo">Repository:</label>
+          <select id="repo" name="repo" required on:change={async (e) => {
+            selectedRepoBranches = [];
+
+            const selected = defaultRepos[e.target.selectedIndex];
+            const branchesReq = await fetch(`https://api.github.com/repos/${selected.split("/")[3]}/${selected.split("/")[4]}/branches`)
+            const branchesJson = await branchesReq.json();
+
+            const branchNames = branchesJson.map(b => b.name);
+            selectedRepoBranches = branchNames;
+          }}>
+        {#each defaultRepos as repo}
+          <option value={repo}>{repo}</option>
+        {/each}
+          </select>
+        </div>
+      {/if}
       <div>
-      <label for="repo-url">Repository URL</label>
-      <input id="repo-url" name="repo-url" type="text" required />
-      </div>
-      <div>
-      <label for="repo-branch">Branch</label>
-      <input id="repo-branch" name="repo-branch" type="text" required />
+        <label for="branch">Branch:</label>
+        <select id="branch" name="branch" required>
+          {#each selectedRepoBranches as branch}
+            <option value={branch}>{branch}</option>
+          {/each}
+        </select>
       </div>
     </fieldset>
-    <button type="button" on:click={() => {
+    <button type="button" on:click={async () => {
       const fieldsets = document.querySelectorAll("fieldset");
       const lastFieldset = fieldsets[fieldsets.length - 1];
       const clone = lastFieldset.cloneNode(true) as HTMLElement;
+
+      const existingDeleteBtn = clone.querySelector("button");
+
+      if (existingDeleteBtn) {
+        existingDeleteBtn.remove();
+      }
 
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
@@ -100,11 +128,49 @@ onMount(() => {
       deleteBtn.style.marginLeft = "1rem";
       deleteBtn.onclick = () => clone.remove();
       clone.appendChild(deleteBtn);
-      
-      clone.querySelectorAll("input").forEach(input => {
-        input.value = "";
-        input.required = false;
+
+      // Make repo select in the clone fetch branches on change
+      const repoSelect = clone.querySelector('select[name="repo"]');
+      const branchSelect = clone.querySelector('select[name="branch"]');
+      if (repoSelect && branchSelect) {
+        repoSelect.selectedIndex = 0;
+
+        // Refetch branches for the cloned repo select
+        const selected = repoSelect.value;
+        const parts = selected.split("/");
+        const branchesReq = await fetch(`https://api.github.com/repos/${parts[3]}/${parts[4]}/branches`);
+        const branchesJson = await branchesReq.json();
+        const branchNames = branchesJson.map((b: any) => b.name);
+
+        // Clear and repopulate branch select
+        branchSelect.innerHTML = "";
+        branchNames.forEach((branch: string) => {
+          const option = document.createElement("option");
+          option.value = branch;
+          option.textContent = branch;
+          branchSelect.appendChild(option);
+        });
+
+        repoSelect.addEventListener('change', async (e: Event) => {
+          const target = e.target as HTMLSelectElement;
+          const selected = target.value;
+          const parts = selected.split("/");
+
+        const branchesReq = await fetch(`https://api.github.com/repos/${parts[3]}/${parts[4]}/branches`);
+        const branchesJson = await branchesReq.json();
+        const branchNames = branchesJson.map((b: any) => b.name);
+
+        // Clear and repopulate branch select
+        branchSelect.innerHTML = "";
+        branchNames.forEach((branch: string) => {
+          const option = document.createElement("option");
+          option.value = branch;
+          option.textContent = branch;
+          branchSelect.appendChild(option);
+        });
       });
+      }
+
       lastFieldset.after(clone);
     }}>
       Add Another Repository

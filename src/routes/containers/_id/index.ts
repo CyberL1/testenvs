@@ -19,10 +19,13 @@ export const methods = {
       Params: Environment;
       Querystring: RemoveEnvironmentQuery;
     }>,
+    reply,
   ) => {
     const container = getEnvironment(req.params.id);
 
     await container.remove({ force: req.query.force === "true" });
-    return getEnvironmentResponse(container);
+
+    reply.code(204);
+    return null;
   },
 };

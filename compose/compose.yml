@@ -6,6 +6,7 @@ services:
     env_file: ../.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/app/data
   proxy:
     build: ../proxy
     env_file: ../.env

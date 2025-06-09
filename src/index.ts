@@ -4,7 +4,14 @@ import fastify, {
   type RouteHandler,
   type RouteOptions,
 } from "fastify";
-import { readdirSync } from "fs";
+import { existsSync, readdirSync, writeFileSync } from "fs";
+
+if (!existsSync("data/default_repos.json")) {
+  writeFileSync(
+    "data/default_repos.json",
+    JSON.stringify(["https://github.com/CyberL1/testenvs"]),
+  );
+}
 
 const app = fastify();
 
